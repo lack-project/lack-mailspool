@@ -13,7 +13,8 @@ function parseFrontMatter(string $input) {
     // Parse YAML front matter
     try {
         // Parse YAML front matter
-        $metadata = yaml_parse($matches[1]);
+        $metadata = phore_yaml_decode($matches[1]);
+
     } catch (Exception $e) {
         // Find the line number of the error
         preg_match_all("/\n/", substr($input, 0, strpos($input, $matches[1])), $lines);
@@ -33,7 +34,7 @@ function serializeFrontMatter($metadata, string $content): string {
     // Convert the metadata to YAML format
     $yaml = yaml_emit($metadata, YAML_UTF8_ENCODING);
 
-    // Ensure that the YAML string does not contain the ending '...' 
+    // Ensure that the YAML string does not contain the ending '...'
     // which is sometimes added by yaml_emit
     $yaml = rtrim($yaml, "...\n");
 

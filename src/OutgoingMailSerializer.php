@@ -12,7 +12,7 @@ class OutgoingMailSerializer
     public static function LoadFromFile(string $filename) : OutgoingMail {
         try {
             $data = parseFrontMatter(phore_file($filename)->get_contents());
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new \Exception("Error parsing $filename: " . $e->getMessage());
         }
         $mail = new OutgoingMail();
@@ -39,19 +39,19 @@ class OutgoingMailSerializer
                 $mail->attachments[] = new OutgoingMailAttachment($fileName, phore_file($file)->get_contents());
             }
         }
-        
+
         return $mail;
     }
 
-    
+
     public static function SaveToFile(OutgoingMail $mail, string $storePath) : void {
-     
-        
+
+
         // Combine assoc array $mail->headers and $mail->metadata into single assoc array
         $headers = array_merge($mail->headers, $mail->metadata);
-        
+
         $baseName = $storePath . "/" . $mail->getMailSpoolId();
-        
+
         foreach ($mail->attachments as $attachment) {
             phore_file($baseName . "." . $attachment->filename)->set_contents($attachment->content);
         }
