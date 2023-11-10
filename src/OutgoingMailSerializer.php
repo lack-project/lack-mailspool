@@ -31,6 +31,10 @@ class OutgoingMailSerializer
         $dir = dirname($filename);
         foreach ($files = phore_dir($dir)->listFiles($mailId . ".*") as $file) {
             $ext = pathinfo($file, PATHINFO_EXTENSION);
+
+            if (str_ends_with($file, ".mail.txt"))
+                continue;
+
             // strip mailId from Filename
             $fileName = substr(basename($file), strlen($mailId) + 1);
             if ($ext == "html") {
@@ -53,7 +57,7 @@ class OutgoingMailSerializer
         $baseName = $storePath . "/" . $mail->getMailSpoolId();
 
         foreach ($mail->attachments as $attachment) {
-            phore_file($baseName . "." . $attachment->filename)->set_contents($attachment->content);
+            phore_file($baseName . "." . $attachment->filename)->set_contents($attachment->data);
         }
         phore_file($baseName . ".mail.txt")->set_contents(serializeFrontMatter($headers, $mail->textBody));
     }

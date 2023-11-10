@@ -32,11 +32,13 @@ function parseFrontMatter(string $input) {
 
 function serializeFrontMatter($metadata, string $content): string {
     // Convert the metadata to YAML format
-    $yaml = yaml_emit($metadata, YAML_UTF8_ENCODING);
 
-    // Ensure that the YAML string does not contain the ending '...'
-    // which is sometimes added by yaml_emit
-    $yaml = rtrim($yaml, "...\n");
+    $yaml = phore_yaml_encode($metadata);
+
+    // Remove starting and ending tags of yaml_emit
+    $yaml = preg_replace('/^---\s+/', '', $yaml);
+    $yaml = preg_replace('/\n...$/', '', $yaml);
+    $yaml = rtrim($yaml, "\n");
 
     // Combine the YAML front matter and the content
     return "---\n" . $yaml . "\n---\n" . $content;

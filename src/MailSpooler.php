@@ -17,7 +17,7 @@ class MailSpooler
 
     public function spoolMail(OutgoingMail $mail)
     {
-        $this->spoolMailToDb($mail);
+        OutgoingMailSerializer::SaveToFile($mail, $this->spoolDir);
     }
 
 
