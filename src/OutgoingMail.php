@@ -61,6 +61,50 @@ class OutgoingMail
         return MailIdGenerator::generateId($mail->headers["To"], $mail->headers["Subject"]) . "-" . addslashes($mail->headers["To"]);
 
     }
+
+    /**
+     * Load mail from File and replace {{name}} with $data[name]
+     * 
+     * @param string $templateFile
+     * @param array $data
+     * @return $this
+     * @throws \Exception
+     */
+    public function FromTemplate(string $templateFile, array $data) : self {
+        $mail = OutgoingMailSerializer::LoadFromFile($templateFile);
+        
+        $parser = function ($input, bool $sanitizeheader = false) use ($data) {
+            if ($input === null)
+                return null;
+
+
+            if ($sanitizeheader) {
+                $ret = str_replace("\r\n", "\n", $ret);
+                $ret = str_replace("\r", "\n", $ret);
+                $ret = str_replace("\n", "\r\n", $ret);
+            }
+            
+            return preg_replace_callback("/{{\s*([a-zA-Z0-9_]+)\s*}}/", function ($matches) use ($data, $templateFile, $sanitizeheader) {
+                if ( ! isset ($data[$matches[1]]))
+                    throw new \InvalidArgumentException("Template variable '{$matches[1]}' not found in data (template: $templateFile)");
+                $ret = $data[$matches[1]];
+                if ($sanitizeheader) {
+                    $ret = str_replace("\r\n", "\n", $ret);
+                    $ret = str_replace("\r", "\n", $ret);
+                    $ret = str_replace("\n", "\r\n", $ret);
+                }
+                return $ret;
+            }, $input);
+        };
+        
+       
+        foreach ($this->headers as $key => $val) {
+            $this->headers[$key] = $parser($val);
+        }
+        $mail->textBody = $parser($mail->textBody);
+        
+        return $this;
+    }
     
 
 }
