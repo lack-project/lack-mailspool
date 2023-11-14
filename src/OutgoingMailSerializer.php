@@ -48,6 +48,15 @@ class OutgoingMailSerializer
     }
 
 
+    public static function Delete(OutgoingMail $mail) : void {
+        $baseName = $storePath . "/" . $mail->getMailSpoolId();
+        foreach ($mail->attachments as $attachment) {
+            phore_file($baseName . "." . $attachment->filename)->unlink();
+        }
+        phore_file($baseName . ".mail.txt")->unlink();
+    }
+
+
     public static function SaveToFile(OutgoingMail $mail, string $storePath) : void {
 
 
