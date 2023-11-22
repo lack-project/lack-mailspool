@@ -58,7 +58,7 @@ class OutgoingMail
 
 
     public function getMailSpoolId() : string {
-        return MailIdGenerator::generateId($this->headers["To"], $this->headers["Subject"]) . "-" . addslashes($this->headers["To"]);
+        return MailIdGenerator::generateId($this->headers["To"], $this->headers["Subject"]) . "-" . addslashes((string)$this->headers["To"]);
 
     }
 

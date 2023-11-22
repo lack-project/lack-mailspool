@@ -40,7 +40,7 @@ class OutgoingMailSerializer
             if ($ext == "html") {
                 $mail->htmlBody = phore_file($file)->get_contents();
             } else {
-                $mail->attachments[] = new OutgoingMailAttachment($fileName, phore_file($file)->get_contents());
+                $mail->attachments[] = new OutgoingMailAttachment(phore_file($file)->get_contents(), $fileName);
             }
         }
 
@@ -48,13 +48,7 @@ class OutgoingMailSerializer
     }
 
 
-    public static function Delete(OutgoingMail $mail) : void {
-        $baseName = $storePath . "/" . $mail->getMailSpoolId();
-        foreach ($mail->attachments as $attachment) {
-            phore_file($baseName . "." . $attachment->filename)->unlink();
-        }
-        phore_file($baseName . ".mail.txt")->unlink();
-    }
+
 
 
     public static function SaveToFile(OutgoingMail $mail, string $storePath) : void {
