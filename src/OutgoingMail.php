@@ -85,13 +85,16 @@ class OutgoingMail
             }
 
 
-            return preg_replace_callback("/{{\s*([a-zA-Z0-9_.]+)\s*}}/", function ($matches) use ($data, $templateFile, $dataLoader, $sanitizeheader) {
+            return preg_replace_callback("/{{\s*([a-zA-Z0-9_.]+)(\??)\s*}}/", function ($matches) use ($data, $templateFile, $dataLoader, $sanitizeheader) {
                 $key = $matches[1];
+                $optional = $matches[2] !== null;
                 $ret = phore_pluck($key, $data);
                 if (! $ret) {
                     if ($dataLoader !== null) {
                         $data[$key] = $ret = $dataLoader($key);
                     } else {
+                        if ($optional)
+                            return "";
                         throw new \InvalidArgumentException("Template variable '{$matches[1]}' not found in data (template: $templateFile)");
                     }
 
